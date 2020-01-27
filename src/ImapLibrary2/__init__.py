@@ -293,6 +293,34 @@ class ImapLibrary2(object):
         self._imap.select(folder)
         self._init_multipart_walk()
 
+    def open_mailbox_gmail_oauth(self, **kwargs):
+        """Open IMAP email client session to given ``host`` with given ``user`` and ``password``.
+
+        Arguments:
+        - ``host``: The IMAP host server. (Default None)
+        - ``is_secure``: An indicator flag to connect to IMAP host securely or not. (Default True)
+        - ``password``: The plaintext password to be use to authenticate mailbox on given ``host``.
+        - ``port``: The IMAP port number. (Default None)
+        - ``user``: The username to be use to authenticate mailbox on given ``host``.
+        - ``folder``: The email folder to read from. (Default INBOX)
+
+        Examples:
+        | Open Mailbox | host=HOST | user=USER | password=SECRET |
+        | Open Mailbox | host=HOST | user=USER | password=SECRET | is_secure=False |
+        | Open Mailbox | host=HOST | user=USER | password=SECRET | port=8000 |
+        | Open Mailbox | host=HOST | user=USER | password=SECRET | folder=Drafts
+        """
+        self._imap = IMAP4_SSL('imap.gmail.com')
+        self._imap.debug = 4
+        folder = '"%s"' % str(kwargs.pop('folder', self.FOLDER))
+        user = str(kwargs.pop('user', None))
+        access_token = str(kwargs.pop('accessToken', None))
+        access_string = 'user=%s\1auth=Bearer %s\1\1' % (user, access_token)
+        #access_string = base64.b64encode(access_string.encode()).decode()
+        self._imap.authenticate('XOAUTH2', lambda x: access_string)
+        self._imap.select(folder)
+        self._init_multipart_walk() 
+
     def wait_for_email(self, **kwargs):
         """Wait for email message to arrived base on any given filter criteria.
         Returns email index of the latest email message received.
