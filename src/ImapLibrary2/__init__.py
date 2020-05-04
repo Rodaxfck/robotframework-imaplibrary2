@@ -311,7 +311,7 @@ class ImapLibrary2(object):
         | Open Mailbox | host=HOST | user=USER | password=SECRET | folder=Drafts
         """
         self._imap = IMAP4_SSL('imap.gmail.com')
-        self._imap.debug = 4
+        self._imap.debug = 1	# integer from 0 to 5 where 0 disables debug output and 5 enables full output with wire logging and parsing logs
         folder = '"%s"' % str(kwargs.pop('folder', self.FOLDER))
         user = str(kwargs.pop('user', None))
         access_token = str(kwargs.pop('accessToken', None))
